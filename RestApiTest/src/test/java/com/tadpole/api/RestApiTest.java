@@ -1,6 +1,8 @@
 package com.tadpole.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,6 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RestApiTest {
+	private static String TEST_SERVER_FIRST_PREFIX = "http://127.0.0.1:8080/api/";
+	private static String ACCESS_KEY = "87c83d56-47d2-41a1-a599-9a22ed2470dd";
+	private static String SECRET_KEY = "7291299a-0fa8-4c87-ab0a-cc414b63c625";
+	
 	private CloseableHttpClient httpClient;
 
 	@Before
@@ -34,10 +40,10 @@ public class RestApiTest {
 
 	@Test
 	public void normalRequest() throws ClientProtocolException, IOException {
-		String uri = "http://54.153.73.132:8080/tadpoleapi/rest/base/billy/test?value=1";
+		String uri = TEST_SERVER_FIRST_PREFIX + "elasticsearch/size?size=10&resultType=json";
 		HttpUriRequest request = new HttpGet(uri);
-		request.addHeader("TDB_ACCESS_KEY", "6792671e-9b4e-45c2-92f9-199339c143c7");
-		request.addHeader("TDB_SECRET_KEY", "d468d4e6-daec-4144-b2a0-4add38b72d4a");
+		request.addHeader("TDB_ACCESS_KEY", ACCESS_KEY);
+		request.addHeader("TDB_SECRET_KEY", SECRET_KEY);
 
 		HttpResponse httpResponse = httpClient.execute(request);
 
@@ -53,16 +59,14 @@ public class RestApiTest {
 			output.append(line);
 		}
 		
-		JSONArray array = (JSONArray) JSONValue.parse(output.toString());
-		JSONObject obj = (JSONObject) ((JSONArray)array.get(0)).get(0);
-		assertEquals("1", obj.get("albumid"));
-		assertEquals("1", obj.get("artistid"));
-		assertEquals("For Those About To Rock We Salute You", obj.get("title"));
+		JSONObject obj = (JSONObject) JSONValue.parse(output.toString());
+		assertEquals(false, obj.get("timed_out"));
+//		assertEquals("For Those About To Rock We Salute You", obj.get("title"));
 	}
 
 	@Test
 	public void invalidKey() throws ClientProtocolException, IOException {
-		String uri = "http://54.153.73.132:8080/tadpoleapi/rest/base/billy/test?value=1";
+		String uri = TEST_SERVER_FIRST_PREFIX + "elasticsearch/size?size=10&resultType=json";
 		HttpUriRequest request = new HttpGet(uri);
 
 		HttpResponse httpResponse = httpClient.execute(request);
@@ -81,10 +85,10 @@ public class RestApiTest {
 
 	@Test
 	public void invalidUrl() throws ClientProtocolException, IOException {
-		String uri = "http://54.153.73.132:8080/tadpoleapi/rest/base/xxxxx";
+		String uri = TEST_SERVER_FIRST_PREFIX + "rest/base/xxxxx";
 		HttpUriRequest request = new HttpGet(uri);
-		request.addHeader("TDB_ACCESS_KEY", "6792671e-9b4e-45c2-92f9-199339c143c7");
-		request.addHeader("TDB_SECRET_KEY", "d468d4e6-daec-4144-b2a0-4add38b72d4a");
+		request.addHeader("TDB_ACCESS_KEY", ACCESS_KEY);
+		request.addHeader("TDB_SECRET_KEY", SECRET_KEY);
 
 		HttpResponse httpResponse = httpClient.execute(request);
 
